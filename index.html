@@ -1,114 +1,248 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Factory Inventory Tracker</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            background: #f4f6f8;
-        }
+<title>GMS MCD Inventory Management System</title>
 
-        header {
-            background: #1f2937;
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
+<style>
+*{
+    box-sizing:border-box;
+}
 
-        .container {
-            padding: 20px;
-        }
+body{
+    margin:0;
+    font-family:Arial, sans-serif;
+    background:#f3f6f9;
+    color:#1f2937;
+}
 
-        .dashboard {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-        }
+.header{
+    background:#123b5d;
+    color:white;
+    padding:22px 15px;
+    text-align:center;
+}
 
-        .card {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
+.header h1{
+    margin:0;
+    font-size:24px;
+}
 
-        .card h2 {
-            margin: 5px 0;
-        }
+.header p{
+    margin:7px 0 0;
+    font-size:14px;
+}
 
-        .menu {
-            margin-top: 25px;
-            display: grid;
-            gap: 12px;
-        }
+.container{
+    max-width:1100px;
+    margin:auto;
+    padding:18px;
+}
 
-        button {
-            padding: 15px;
-            border: none;
-            border-radius: 8px;
-            background: #2563eb;
-            color: white;
-            font-size: 16px;
-        }
-    </style>
+.section-title{
+    margin:10px 0 15px;
+    font-size:20px;
+}
+
+.cards{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+}
+
+.card{
+    background:white;
+    padding:18px;
+    border-radius:12px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.10);
+    text-align:center;
+}
+
+.card .number{
+    font-size:28px;
+    font-weight:bold;
+    margin-top:8px;
+}
+
+.card p{
+    margin:0;
+    font-size:14px;
+}
+
+.menu{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+    margin-top:15px;
+}
+
+.menu button{
+    border:0;
+    padding:15px 10px;
+    border-radius:10px;
+    background:white;
+    box-shadow:0 2px 8px rgba(0,0,0,0.10);
+    font-size:15px;
+    font-weight:bold;
+    color:#123b5d;
+}
+
+.summary{
+    margin-top:25px;
+    background:white;
+    padding:18px;
+    border-radius:12px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.10);
+}
+
+.summary h3{
+    margin-top:0;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:10px;
+}
+
+th,td{
+    border:1px solid #ddd;
+    padding:10px;
+    text-align:center;
+    font-size:13px;
+}
+
+th{
+    background:#123b5d;
+    color:white;
+}
+
+.footer{
+    text-align:center;
+    padding:20px;
+    font-size:12px;
+    color:#666;
+}
+
+@media(min-width:700px){
+    .cards{
+        grid-template-columns:repeat(4,1fr);
+    }
+
+    .menu{
+        grid-template-columns:repeat(3,1fr);
+    }
+}
+</style>
 </head>
 
 <body>
 
-<header>
-    <h1>Factory Inventory Tracker</h1>
+<div class="header">
+    <h1>GMS MCD Inventory Management System</h1>
     <p>Serviceable • Repairable • Unserviceable</p>
-</header>
+</div>
 
 <div class="container">
 
-    <div class="dashboard">
+    <h2 class="section-title">📊 Dashboard</h2>
+
+    <div class="cards">
 
         <div class="card">
-            <p>Total Items</p>
-            <h2>0</h2>
+            <p>📦 Total Items</p>
+            <div class="number">0</div>
         </div>
 
         <div class="card">
-            <p>Current Stock</p>
-            <h2>0</h2>
+            <p>🟢 Serviceable</p>
+            <div class="number">0</div>
         </div>
 
         <div class="card">
-            <p>Total Receive</p>
-            <h2>0</h2>
+            <p>🟡 Repairable</p>
+            <div class="number">0</div>
         </div>
 
         <div class="card">
-            <p>Total Issue</p>
-            <h2>0</h2>
+            <p>🔴 Unserviceable</p>
+            <div class="number">0</div>
+        </div>
+
+        <div class="card">
+            <p>📥 Total Receive</p>
+            <div class="number">0</div>
+        </div>
+
+        <div class="card">
+            <p>📤 Total Issue</p>
+            <div class="number">0</div>
+        </div>
+
+        <div class="card">
+            <p>📊 Current Stock</p>
+            <div class="number">0</div>
+        </div>
+
+        <div class="card">
+            <p>⚠️ Low Stock</p>
+            <div class="number">0</div>
         </div>
 
     </div>
+
+    <h2 class="section-title" style="margin-top:28px;">
+        ⚙️ Inventory Menu
+    </h2>
 
     <div class="menu">
 
         <button>📦 Item Master</button>
 
-        <button>➕ Receive</button>
+        <button>📥 Daily Receive</button>
 
-        <button>➖ Issue</button>
+        <button>📤 Daily Issue</button>
 
-        <button>🔧 Serviceable</button>
+        <button>📊 Current Stock</button>
 
-        <button>🛠 Repairable</button>
+        <button>📅 Monthly Summary</button>
 
-        <button>❌ Unserviceable</button>
-
-        <button>📊 Monthly Summary</button>
+        <button>📈 Reports</button>
 
     </div>
 
+    <div class="summary">
+
+        <h3>📅 Monthly Receive & Issue Summary</h3>
+
+        <table>
+
+            <tr>
+                <th>Month</th>
+                <th>Receive</th>
+                <th>Issue</th>
+                <th>Closing Stock</th>
+            </tr>
+
+            <tr>
+                <td>August 2026</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+            </tr>
+
+        </table>
+
+    </div>
+
+</div>
+
+<div class="footer">
+    GMS Textiles Ltd. | General Technical MCD
+    <br>
+    Inventory Management System
 </div>
 
 </body>
