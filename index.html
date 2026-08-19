@@ -244,6 +244,271 @@ th{
     <br>
     Inventory Management System
 </div>
+<!-- ================= ITEM MASTER START ================= -->
 
+<section id="itemMasterSection" style="padding:20px; margin-top:20px; background:#f8fafc; border-radius:15px;">
+
+  <h2 style="margin-bottom:15px;">📦 Item Master</h2>
+
+  <div style="background:white; padding:15px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.08);">
+
+    <h3>Add New Item</h3>
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px;">
+
+      <input id="imCategory" type="text" placeholder="Category">
+
+      <input id="imItemCode" type="text" placeholder="Item Code">
+
+      <input id="imItemName" type="text" placeholder="Item Name">
+
+      <input id="imUnit" type="text" placeholder="Unit (Pcs/Set/Kg)">
+
+      <input id="imStatus" type="text" placeholder="Status">
+
+      <input id="imOpeningStock" type="number" min="0" placeholder="Opening Stock">
+
+      <input id="imLocation" type="text" placeholder="Location">
+
+      <input id="imRemarks" type="text" placeholder="Remarks">
+
+    </div>
+
+    <button onclick="addInventoryItem()"
+      style="margin-top:15px; padding:10px 20px; border:0; border-radius:8px; cursor:pointer;">
+      ➕ Save Item
+    </button>
+
+  </div>
+
+
+  <div style="background:white; padding:15px; margin-top:20px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.08);">
+
+    <h3>Item Master List</h3>
+
+    <input id="imSearch"
+      type="text"
+      placeholder="🔍 Search Item Code / Item Name / Category"
+      oninput="displayInventoryItems()"
+      style="width:100%; padding:10px; margin-bottom:15px; box-sizing:border-box;">
+
+    <div style="overflow-x:auto;">
+
+      <table style="width:100%; border-collapse:collapse; min-width:950px;">
+
+        <thead>
+          <tr style="background:#e2e8f0;">
+            <th style="padding:8px;">SL No.</th>
+            <th style="padding:8px;">Category</th>
+            <th style="padding:8px;">Item Code</th>
+            <th style="padding:8px;">Item Name</th>
+            <th style="padding:8px;">Unit</th>
+            <th style="padding:8px;">Status</th>
+            <th style="padding:8px;">Opening Stock</th>
+            <th style="padding:8px;">Present Stock</th>
+            <th style="padding:8px;">Location</th>
+            <th style="padding:8px;">Remarks</th>
+          </tr>
+        </thead>
+
+        <tbody id="itemMasterTableBody"></tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<script>
+/* ================= ITEM MASTER DATA ================= */
+
+let inventoryItems = JSON.parse(
+  localStorage.getItem("gms_mcd_inventory_items") || "[]"
+);
+
+
+/* ================= ADD ITEM ================= */
+
+function addInventoryItem() {
+
+  const category = document.getElementById("imCategory").value.trim();
+  const itemCode = document.getElementById("imItemCode").value.trim();
+  const itemName = document.getElementById("imItemName").value.trim();
+  const unit = document.getElementById("imUnit").value.trim();
+  const status = document.getElementById("imStatus").value.trim();
+  const openingStock = Number(document.getElementById("imOpeningStock").value || 0);
+  const location = document.getElementById("imLocation").value.trim();
+  const remarks = document.getElementById("imRemarks").value.trim();
+
+
+  if (!category || !itemCode || !itemName || !unit) {
+    alert("Please enter Category, Item Code, Item Name and Unit.");
+    return;
+  }
+
+
+  /* Duplicate Item Code Check */
+
+  const duplicate = inventoryItems.some(
+    item => item.itemCode.toLowerCase() === itemCode.toLowerCase()
+  );
+
+  if (duplicate) {
+    alert("This Item Code already exists.");
+    return;
+  }
+
+
+  const newItem = {
+
+    category: category,
+
+    itemCode: itemCode,
+
+    itemName: itemName,
+
+    unit: unit,
+
+    status: status,
+
+    openingStock: openingStock,
+
+    presentStock: openingStock,
+
+    location: location,
+
+    remarks: remarks
+
+  };
+
+
+  inventoryItems.push(newItem);
+
+  localStorage.setItem(
+    "gms_mcd_inventory_items",
+    JSON.stringify(inventoryItems)
+  );
+
+
+  clearItemMasterForm();
+
+  displayInventoryItems();
+
+  alert("Item saved successfully.");
+}
+
+
+/* ================= CLEAR FORM ================= */
+
+function clearItemMasterForm() {
+
+  document.getElementById("imCategory").value = "";
+
+  document.getElementById("imItemCode").value = "";
+
+  document.getElementById("imItemName").value = "";
+
+  document.getElementById("imUnit").value = "";
+
+  document.getElementById("imStatus").value = "";
+
+  document.getElementById("imOpeningStock").value = "";
+
+  document.getElementById("imLocation").value = "";
+
+  document.getElementById("imRemarks").value = "";
+}
+
+
+/* ================= DISPLAY ITEM LIST ================= */
+
+function displayInventoryItems() {
+
+  const tableBody =
+    document.getElementById("itemMasterTableBody");
+
+  const search =
+    document.getElementById("imSearch").value.toLowerCase();
+
+
+  tableBody.innerHTML = "";
+
+
+  const filteredItems = inventoryItems.filter(item =>
+
+    item.itemCode.toLowerCase().includes(search) ||
+
+    item.itemName.toLowerCase().includes(search) ||
+
+    item.category.toLowerCase().includes(search)
+
+  );
+
+
+  filteredItems.forEach((item, index) => {
+
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+
+      <td style="padding:8px; border-bottom:1px solid #ddd;">
+        ${index + 1}
+      </td>
+
+      <td style="padding:8px; border-bottom:1px solid #ddd;">
+        ${item.category}
+      </td>
+
+      <td style="padding:8px; border-bottom:1px solid #ddd;">
+        ${item.itemCode}
+      </td>
+
+      <td style="padding:8px; border-bottom:1px solid #ddd;">
+        ${item.itemName}
+      </td>
+
+      <td style="padding:8px; border-bottom:1px solid #ddd;">
+        ${item.unit}
+      </td>
+
+      <td style="padding:8px; border-bottom:1px solid #ddd;">
+        ${item.status}
+      </td>
+
+      <td style="padding:8px; border-bottom:1px solid #ddd;">
+        ${item.openingStock}
+      </td>
+
+      <td style="padding:8px; border-bottom:1px solid #ddd; font-weight:bold;">
+        ${item.presentStock}
+      </td>
+
+      <td style="padding:8px; border-bottom:1px solid #ddd;">
+        ${item.location}
+      </td>
+
+      <td style="padding:8px; border-bottom:1px solid #ddd;">
+        ${item.remarks}
+      </td>
+
+    `;
+
+    tableBody.appendChild(row);
+
+  });
+
+}
+
+
+/* ================= LOAD ITEMS ================= */
+
+displayInventoryItems();
+
+</script>
+
+<!-- ================= ITEM MASTER END ================= -->
 </body>
 </html>
