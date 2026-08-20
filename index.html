@@ -509,6 +509,390 @@ displayInventoryItems();
 
 </script>
 
-<!-- ================= ITEM MASTER END ================= -->
+<!-- ================= ITEM MASTER END ================= --><!-- ================= TRANSACTION ENTRY START ================= -->
+
+<section id="transactionSection" style="padding:20px; margin-top:20px; background:#f1f5f9; border-radius:15px;">
+
+  <h2 style="margin-bottom:15px;">🔄 Transaction Entry</h2>
+
+  <div style="background:white; padding:15px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.08);">
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px;">
+
+      <input id="txDate" type="date">
+
+      <input id="txCategory" type="text" placeholder="Category">
+
+      <input id="txItemCode" type="text" placeholder="Item Code">
+
+      <input id="txItemName" type="text" placeholder="Item Name">
+
+      <input id="txUnit" type="text" placeholder="Unit">
+
+      <input id="txStatus" type="text" placeholder="Status">
+
+      <input id="txReceiveChallan" type="text" placeholder="Receive/Challan No.">
+
+      <input id="txIssueId" type="text" placeholder="Issue ID">
+
+      <input id="txQty" type="number" min="0" placeholder="Qty">
+
+      <input id="txLocation" type="text" placeholder="Location">
+
+      <input id="txRemarks" type="text" placeholder="Remarks">
+
+    </div>
+
+    <div style="margin-top:15px; padding:12px; background:#f8fafc; border-radius:10px;">
+
+      <strong>Previous Stock:</strong>
+      <span id="txPreviousStock">0</span>
+
+      &nbsp;&nbsp;&nbsp;
+
+      <strong>Present Stock:</strong>
+      <span id="txPresentStock">0</span>
+
+    </div>
+
+    <button onclick="saveInventoryTransaction()"
+      style="margin-top:15px; padding:10px 20px; border:0; border-radius:8px; cursor:pointer;">
+      💾 Save Transaction
+    </button>
+
+  </div>
+
+
+  <div style="background:white; padding:15px; margin-top:20px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.08);">
+
+    <h3>Transaction History</h3>
+
+    <div style="overflow-x:auto;">
+
+      <table style="width:100%; border-collapse:collapse; min-width:1300px;">
+
+        <thead>
+          <tr style="background:#e2e8f0;">
+
+            <th style="padding:8px;">SL</th>
+            <th style="padding:8px;">Date</th>
+            <th style="padding:8px;">Category</th>
+            <th style="padding:8px;">Item Code</th>
+            <th style="padding:8px;">Item Name</th>
+            <th style="padding:8px;">Unit</th>
+            <th style="padding:8px;">Status</th>
+            <th style="padding:8px;">Receive/Challan No.</th>
+            <th style="padding:8px;">Issue ID</th>
+            <th style="padding:8px;">Qty</th>
+            <th style="padding:8px;">Previous Stock</th>
+            <th style="padding:8px;">Present Stock</th>
+            <th style="padding:8px;">Location</th>
+            <th style="padding:8px;">Remarks</th>
+
+          </tr>
+        </thead>
+
+        <tbody id="transactionTableBody"></tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<script>
+
+/* ================= TRANSACTION DATA ================= */
+
+let inventoryTransactions = JSON.parse(
+  localStorage.getItem("gms_mcd_inventory_transactions") || "[]"
+);
+
+
+/* ================= ITEM CODE LOOKUP ================= */
+
+document.getElementById("txItemCode").addEventListener("input", function() {
+
+  const code = this.value.trim().toLowerCase();
+
+  const item = inventoryItems.find(
+    x => x.itemCode.toLowerCase() === code
+  );
+
+  if (item) {
+
+    document.getElementById("txCategory").value = item.category;
+
+    document.getElementById("txItemName").value = item.itemName;
+
+    document.getElementById("txUnit").value = item.unit;
+
+    document.getElementById("txStatus").value = item.status;
+
+    document.getElementById("txLocation").value = item.location;
+
+    document.getElementById("txPreviousStock").textContent =
+      item.presentStock;
+
+    document.getElementById("txPresentStock").textContent =
+      item.presentStock;
+
+  }
+
+});
+
+
+/* ================= SAVE TRANSACTION ================= */
+
+function saveInventoryTransaction() {
+
+  const date = document.getElementById("txDate").value;
+
+  const category = document.getElementById("txCategory").value.trim();
+
+  const itemCode = document.getElementById("txItemCode").value.trim();
+
+  const itemName = document.getElementById("txItemName").value.trim();
+
+  const unit = document.getElementById("txUnit").value.trim();
+
+  const status = document.getElementById("txStatus").value.trim();
+
+  const receiveChallan =
+    document.getElementById("txReceiveChallan").value.trim();
+
+  const issueId =
+    document.getElementById("txIssueId").value.trim();
+
+  const qty =
+    Number(document.getElementById("txQty").value || 0);
+
+  const location =
+    document.getElementById("txLocation").value.trim();
+
+  const remarks =
+    document.getElementById("txRemarks").value.trim();
+
+
+  if (!date || !itemCode || qty <= 0) {
+
+    alert("Please enter Date, Item Code and Qty.");
+
+    return;
+
+  }
+
+
+  const item = inventoryItems.find(
+    x => x.itemCode.toLowerCase() === itemCode.toLowerCase()
+  );
+
+
+  if (!item) {
+
+    alert("Item Code not found in Item Master.");
+
+    return;
+
+  }
+
+
+  const previousStock = Number(item.presentStock || 0);
+
+
+  /* RECEIVE */
+
+  if (receiveChallan && !issueId) {
+
+    item.presentStock = previousStock + qty;
+
+  }
+
+
+  /* ISSUE */
+
+  else if (issueId && !receiveChallan) {
+
+    if (qty > previousStock) {
+
+      alert("Issue quantity cannot be greater than Present Stock.");
+
+      return;
+
+    }
+
+    item.presentStock = previousStock - qty;
+
+  }
+
+
+  /* INVALID TRANSACTION */
+
+  else {
+
+    alert("For Receive enter Receive/Challan No. OR for Issue enter Issue ID.");
+
+    return;
+
+  }
+
+
+  const presentStock = item.presentStock;
+
+
+  const transaction = {
+
+    date,
+
+    category,
+
+    itemCode,
+
+    itemName,
+
+    unit,
+
+    status,
+
+    receiveChallan,
+
+    issueId,
+
+    qty,
+
+    previousStock,
+
+    presentStock,
+
+    location,
+
+    remarks
+
+  };
+
+
+  inventoryTransactions.push(transaction);
+
+
+  localStorage.setItem(
+    "gms_mcd_inventory_transactions",
+    JSON.stringify(inventoryTransactions)
+  );
+
+
+  localStorage.setItem(
+    "gms_mcd_inventory_items",
+    JSON.stringify(inventoryItems)
+  );
+
+
+  document.getElementById("txPreviousStock").textContent =
+    previousStock;
+
+  document.getElementById("txPresentStock").textContent =
+    presentStock;
+
+
+  displayInventoryTransactions();
+
+
+  alert("Transaction saved successfully.");
+
+}
+
+
+/* ================= TRANSACTION HISTORY ================= */
+
+function displayInventoryTransactions() {
+
+  const body =
+    document.getElementById("transactionTableBody");
+
+  body.innerHTML = "";
+
+
+  inventoryTransactions.forEach((tx, index) => {
+
+    const row = document.createElement("tr");
+
+
+    row.innerHTML = `
+
+      <td style="padding:8px; border-bottom:1px solid #ddd;">
+        ${index + 1}
+      </td>
+
+      <td style="padding:8px; border-bottom:1px solid #ddd;">
+        ${tx.date}
+      </td>
+
+      <td style="padding:8px; border-bottom:1px solid #ddd;">
+        ${tx.category}
+      </td>
+
+      <td style="padding:8px; border-bottom:1px solid #ddd;">
+        ${tx.itemCode}
+      </td>
+
+      <td style="padding:8px; border-bottom:1px solid #ddd;">
+        ${tx.itemName}
+      </td>
+
+      <td style="padding:8px; border-bottom:1px solid #ddd;">
+        ${tx.unit}
+      </td>
+
+      <td style="padding:8px; border-bottom:1px solid #ddd;">
+        ${tx.status}
+      </td>
+
+      <td style="padding:8px; border-bottom:1px solid #ddd;">
+        ${tx.receiveChallan || "-"}
+      </td>
+
+      <td style="padding:8px; border-bottom:1px solid #ddd;">
+        ${tx.issueId || "-"}
+      </td>
+
+      <td style="padding:8px; border-bottom:1px solid #ddd;">
+        ${tx.qty}
+      </td>
+
+      <td style="padding:8px; border-bottom:1px solid #ddd;">
+        ${tx.previousStock}
+      </td>
+
+      <td style="padding:8px; border-bottom:1px solid #ddd; font-weight:bold;">
+        ${tx.presentStock}
+      </td>
+
+      <td style="padding:8px; border-bottom:1px solid #ddd;">
+        ${tx.location}
+      </td>
+
+      <td style="padding:8px; border-bottom:1px solid #ddd;">
+        ${tx.remarks}
+      </td>
+
+    `;
+
+
+    body.appendChild(row);
+
+  });
+
+}
+
+
+/* ================= LOAD TRANSACTIONS ================= */
+
+displayInventoryTransactions();
+
+</script>
+
+<!-- ================= TRANSACTION ENTRY END ================= -->
 </body>
 </html>
