@@ -893,6 +893,245 @@ displayInventoryTransactions();
 
 </script>
 
-<!-- ================= TRANSACTION ENTRY END ================= -->
+<!-- ================= TRANSACTION ENTRY END ================= --><!-- ================= MONTHLY SUMMARY START ================= -->
+
+<section id="monthlySummarySection" style="padding:20px; margin-top:20px; background:#f8fafc; border-radius:15px;">
+
+  <h2 style="margin-bottom:15px;">📊 Monthly Receive & Issue Summary</h2>
+
+  <div style="background:white; padding:15px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.08);">
+
+    <label><strong>Select Month:</strong></label>
+
+    <input
+      id="summaryMonth"
+      type="month"
+      onchange="generateMonthlySummary()"
+      style="padding:10px; margin:10px 0 20px 10px;"
+    >
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px;">
+
+      <div style="padding:15px; background:#eef6ff; border-radius:10px;">
+        <div>Total Receive</div>
+        <strong id="summaryReceive">0</strong>
+      </div>
+
+      <div style="padding:15px; background:#fff4e6; border-radius:10px;">
+        <div>Total Issue</div>
+        <strong id="summaryIssue">0</strong>
+      </div>
+
+      <div style="padding:15px; background:#f0fdf4; border-radius:10px;">
+        <div>Net Movement</div>
+        <strong id="summaryNet">0</strong>
+      </div>
+
+      <div style="padding:15px; background:#f8f8f8; border-radius:10px;">
+        <div>Total Transactions</div>
+        <strong id="summaryTransactions">0</strong>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div style="background:white; padding:15px; margin-top:20px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.08);">
+
+    <h3>Monthly Transaction Details</h3>
+
+    <div style="overflow-x:auto;">
+
+      <table style="width:100%; border-collapse:collapse; min-width:1000px;">
+
+        <thead>
+
+          <tr style="background:#e2e8f0;">
+
+            <th style="padding:8px;">SL</th>
+            <th style="padding:8px;">Date</th>
+            <th style="padding:8px;">Item Code</th>
+            <th style="padding:8px;">Item Name</th>
+            <th style="padding:8px;">Receive/Challan No.</th>
+            <th style="padding:8px;">Issue ID</th>
+            <th style="padding:8px;">Qty</th>
+            <th style="padding:8px;">Previous Stock</th>
+            <th style="padding:8px;">Present Stock</th>
+
+          </tr>
+
+        </thead>
+
+        <tbody id="monthlySummaryTableBody"></tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<script>
+
+/* ================= MONTHLY SUMMARY ================= */
+
+function generateMonthlySummary() {
+
+  const monthInput =
+    document.getElementById("summaryMonth").value;
+
+  const tableBody =
+    document.getElementById("monthlySummaryTableBody");
+
+  tableBody.innerHTML = "";
+
+
+  if (!monthInput) {
+
+    document.getElementById("summaryReceive").textContent = "0";
+
+    document.getElementById("summaryIssue").textContent = "0";
+
+    document.getElementById("summaryNet").textContent = "0";
+
+    document.getElementById("summaryTransactions").textContent = "0";
+
+    return;
+
+  }
+
+
+  const monthlyTransactions =
+    inventoryTransactions.filter(tx =>
+
+      tx.date && tx.date.startsWith(monthInput)
+
+    );
+
+
+  let totalReceive = 0;
+
+  let totalIssue = 0;
+
+
+  monthlyTransactions.forEach((tx, index) => {
+
+    const qty = Number(tx.qty || 0);
+
+
+    if (tx.receiveChallan && !tx.issueId) {
+
+      totalReceive += qty;
+
+    }
+
+
+    if (tx.issueId && !tx.receiveChallan) {
+
+      totalIssue += qty;
+
+    }
+
+
+    const row = document.createElement("tr");
+
+
+    row.innerHTML = `
+
+      <td style="padding:8px; border-bottom:1px solid #ddd;">
+        ${index + 1}
+      </td>
+
+      <td style="padding:8px; border-bottom:1px solid #ddd;">
+        ${tx.date}
+      </td>
+
+      <td style="padding:8px; border-bottom:1px solid #ddd;">
+        ${tx.itemCode}
+      </td>
+
+      <td style="padding:8px; border-bottom:1px solid #ddd;">
+        ${tx.itemName}
+      </td>
+
+      <td style="padding:8px; border-bottom:1px solid #ddd;">
+        ${tx.receiveChallan || "-"}
+      </td>
+
+      <td style="padding:8px; border-bottom:1px solid #ddd;">
+        ${tx.issueId || "-"}
+      </td>
+
+      <td style="padding:8px; border-bottom:1px solid #ddd;">
+        ${qty}
+      </td>
+
+      <td style="padding:8px; border-bottom:1px solid #ddd;">
+        ${tx.previousStock}
+      </td>
+
+      <td style="padding:8px; border-bottom:1px solid #ddd; font-weight:bold;">
+        ${tx.presentStock}
+      </td>
+
+    `;
+
+
+    tableBody.appendChild(row);
+
+  });
+
+
+  const netMovement =
+    totalReceive - totalIssue;
+
+
+  document.getElementById("summaryReceive").textContent =
+    totalReceive;
+
+
+  document.getElementById("summaryIssue").textContent =
+    totalIssue;
+
+
+  document.getElementById("summaryNet").textContent =
+    netMovement;
+
+
+  document.getElementById("summaryTransactions").textContent =
+    monthlyTransactions.length;
+
+}
+
+
+/* ================= CURRENT MONTH AUTO SELECT ================= */
+
+(function setCurrentSummaryMonth() {
+
+  const now = new Date();
+
+  const month =
+    now.getFullYear() + "-" +
+    String(now.getMonth() + 1).padStart(2, "0");
+
+  const input =
+    document.getElementById("summaryMonth");
+
+  if (input) {
+
+    input.value = month;
+
+    generateMonthlySummary();
+
+  }
+
+})();
+
+</script>
+
+<!-- ================= MONTHLY SUMMARY END ================= -->
 </body>
 </html>
