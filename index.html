@@ -1132,6 +1132,178 @@ function generateMonthlySummary() {
 
 </script>
 
-<!-- ================= MONTHLY SUMMARY END ================= -->
+<!-- ================= MONTHLY SUMMARY END ================= --><!-- ================= DASHBOARD KPI CARDS START ================= -->
+
+<section id="dashboardKpiSection" style="padding:20px; margin-top:20px;">
+
+  <h2 style="margin-bottom:15px;">📊 Inventory Overview</h2>
+
+  <div style="
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:12px;
+  ">
+
+    <div style="background:white; padding:18px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.08);">
+      <div>📦 Total Items</div>
+      <strong id="kpiTotalItems" style="font-size:28px;">0</strong>
+    </div>
+
+    <div style="background:white; padding:18px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.08);">
+      <div>📊 Total Present Stock</div>
+      <strong id="kpiPresentStock" style="font-size:28px;">0</strong>
+    </div>
+
+    <div style="background:white; padding:18px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.08);">
+      <div>📥 Monthly Receive</div>
+      <strong id="kpiMonthlyReceive" style="font-size:28px;">0</strong>
+    </div>
+
+    <div style="background:white; padding:18px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.08);">
+      <div>📤 Monthly Issue</div>
+      <strong id="kpiMonthlyIssue" style="font-size:28px;">0</strong>
+    </div>
+
+    <div style="background:white; padding:18px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.08);">
+      <div>🔧 Serviceable</div>
+      <strong id="kpiServiceable" style="font-size:28px;">0</strong>
+    </div>
+
+    <div style="background:white; padding:18px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.08);">
+      <div>🛠️ Repairable</div>
+      <strong id="kpiRepairable" style="font-size:28px;">0</strong>
+    </div>
+
+    <div style="background:white; padding:18px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.08);">
+      <div>⚠️ Unserviceable</div>
+      <strong id="kpiUnserviceable" style="font-size:28px;">0</strong>
+    </div>
+
+  </div>
+
+</section>
+
+
+<script>
+
+/* ================= DASHBOARD KPI CALCULATION ================= */
+
+function updateDashboardKPIs() {
+
+  /* Total Items */
+
+  const totalItems = inventoryItems.length;
+
+
+  /* Total Present Stock */
+
+  const totalPresentStock = inventoryItems.reduce(
+    (sum, item) => sum + Number(item.presentStock || 0),
+    0
+  );
+
+
+  /* Current Month */
+
+  const now = new Date();
+
+  const currentMonth =
+    now.getFullYear() + "-" +
+    String(now.getMonth() + 1).padStart(2, "0");
+
+
+  const currentMonthTransactions =
+    inventoryTransactions.filter(tx =>
+      tx.date && tx.date.startsWith(currentMonth)
+    );
+
+
+  /* Monthly Receive */
+
+  const monthlyReceive =
+    currentMonthTransactions.reduce((sum, tx) => {
+
+      if (tx.receiveChallan && !tx.issueId) {
+        return sum + Number(tx.qty || 0);
+      }
+
+      return sum;
+
+    }, 0);
+
+
+  /* Monthly Issue */
+
+  const monthlyIssue =
+    currentMonthTransactions.reduce((sum, tx) => {
+
+      if (tx.issueId && !tx.receiveChallan) {
+        return sum + Number(tx.qty || 0);
+      }
+
+      return sum;
+
+    }, 0);
+
+
+  /* Status Summary */
+
+  const serviceable =
+    inventoryItems.filter(item =>
+      String(item.status).toLowerCase() === "serviceable"
+    ).length;
+
+
+  const repairable =
+    inventoryItems.filter(item =>
+      String(item.status).toLowerCase() === "repairable"
+    ).length;
+
+
+  const unserviceable =
+    inventoryItems.filter(item =>
+      String(item.status).toLowerCase() === "unserviceable"
+    ).length;
+
+
+  /* Display */
+
+  document.getElementById("kpiTotalItems").textContent =
+    totalItems;
+
+
+  document.getElementById("kpiPresentStock").textContent =
+    totalPresentStock;
+
+
+  document.getElementById("kpiMonthlyReceive").textContent =
+    monthlyReceive;
+
+
+  document.getElementById("kpiMonthlyIssue").textContent =
+    monthlyIssue;
+
+
+  document.getElementById("kpiServiceable").textContent =
+    serviceable;
+
+
+  document.getElementById("kpiRepairable").textContent =
+    repairable;
+
+
+  document.getElementById("kpiUnserviceable").textContent =
+    unserviceable;
+
+}
+
+
+/* ================= INITIAL LOAD ================= */
+
+updateDashboardKPIs();
+
+</script>
+
+<!-- ================= DASHBOARD KPI CARDS END ================= -->
 </body>
 </html>
