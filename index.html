@@ -1757,6 +1757,104 @@ generateItemWiseReport();
 
 </script>
 
-<!-- ================= ITEM-WISE TRANSACTION REPORT END ================= -->
+<!-- ================= ITEM-WISE TRANSACTION REPORT END ================= --><!-- COMPLETE INVENTORY AUDIT REPORT START -->
+
+<section id="completeAuditReport" style="padding:20px;margin-top:20px;">
+
+<h2>Complete Inventory Audit Report</h2>
+
+<div style="overflow-x:auto;">
+
+<table style="width:100%;border-collapse:collapse;min-width:1200px;">
+
+<thead>
+
+<tr>
+
+<th>SL</th>
+<th>Date</th>
+<th>Category</th>
+<th>Item Code</th>
+<th>Item Name</th>
+<th>Unit</th>
+<th>Status</th>
+<th>Receive/Challan No.</th>
+<th>Issue ID</th>
+<th>Qty</th>
+<th>Previous Stock</th>
+<th>Present Stock</th>
+<th>Location</th>
+<th>Remarks</th>
+
+</tr>
+
+</thead>
+
+<tbody id="completeAuditTable">
+
+</tbody>
+
+</table>
+
+</div>
+
+</section>
+
+
+<script>
+
+function showCompleteAuditReport() {
+
+const table = document.getElementById("completeAuditTable");
+
+if (!table) return;
+
+table.innerHTML = "";
+
+inventoryTransactions.forEach(function(tx, index) {
+
+const row = document.createElement("tr");
+
+row.innerHTML =
+
+"<td>" + (index + 1) + "</td>" +
+
+"<td>" + (tx.date || "") + "</td>" +
+
+"<td>" + (tx.category || "") + "</td>" +
+
+"<td>" + (tx.itemCode || "") + "</td>" +
+
+"<td>" + (tx.itemName || "") + "</td>" +
+
+"<td>" + (tx.unit || "") + "</td>" +
+
+"<td>" + (tx.status || "") + "</td>" +
+
+"<td>" + (tx.receiveChallan || "-") + "</td>" +
+
+"<td>" + (tx.issueId || "-") + "</td>" +
+
+"<td>" + (tx.qty || 0) + "</td>" +
+
+"<td>" + (tx.previousStock || 0) + "</td>" +
+
+"<td>" + (tx.presentStock || 0) + "</td>" +
+
+"<td>" + (tx.location || "") + "</td>" +
+
+"<td>" + (tx.remarks || "") + "</td>";
+
+table.appendChild(row);
+
+});
+
+}
+
+showCompleteAuditReport();
+
+</script>
+
+<!-- COMPLETE INVENTORY AUDIT REPORT END -->
 </body>
 </html>
