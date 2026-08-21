@@ -1304,6 +1304,197 @@ updateDashboardKPIs();
 
 </script>
 
-<!-- ================= DASHBOARD KPI CARDS END ================= -->
+<!-- ================= DASHBOARD KPI CARDS END ================= --><!-- ================= CATEGORY & STATUS SUMMARY START ================= -->
+
+<section id="categoryStatusSummary" style="padding:20px; margin-top:20px; background:#f8fafc; border-radius:15px;">
+
+  <h2 style="margin-bottom:15px;">📊 Category & Status-wise Inventory Summary</h2>
+
+  <div style="background:white; padding:15px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.08);">
+
+    <div style="overflow-x:auto;">
+
+      <table style="width:100%; border-collapse:collapse; min-width:750px;">
+
+        <thead>
+
+          <tr style="background:#e2e8f0;">
+
+            <th style="padding:10px;">SL</th>
+            <th style="padding:10px;">Category</th>
+            <th style="padding:10px;">Serviceable</th>
+            <th style="padding:10px;">Repairable</th>
+            <th style="padding:10px;">Unserviceable</th>
+            <th style="padding:10px;">Total Stock</th>
+
+          </tr>
+
+        </thead>
+
+        <tbody id="categoryStatusTableBody"></tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<script>
+
+/* ================= CATEGORY & STATUS SUMMARY ================= */
+
+function generateCategoryStatusSummary() {
+
+  const tableBody =
+    document.getElementById("categoryStatusTableBody");
+
+  if (!tableBody) return;
+
+  tableBody.innerHTML = "";
+
+
+  const categoryData = {};
+
+
+  /* Collect Item Master Data */
+
+  inventoryItems.forEach(item => {
+
+    const category =
+      item.category || "Uncategorized";
+
+    const status =
+      String(item.status || "").trim().toLowerCase();
+
+    const stock =
+      Number(item.presentStock || 0);
+
+
+    if (!categoryData[category]) {
+
+      categoryData[category] = {
+
+        serviceable: 0,
+
+        repairable: 0,
+
+        unserviceable: 0,
+
+        totalStock: 0
+
+      };
+
+    }
+
+
+    /* Status-wise Stock */
+
+    if (status === "serviceable") {
+
+      categoryData[category].serviceable += stock;
+
+    }
+
+    else if (status === "repairable") {
+
+      categoryData[category].repairable += stock;
+
+    }
+
+    else if (status === "unserviceable") {
+
+      categoryData[category].unserviceable += stock;
+
+    }
+
+
+    /* Total Category Stock */
+
+    categoryData[category].totalStock += stock;
+
+  });
+
+
+  const categories =
+    Object.keys(categoryData);
+
+
+  /* Display */
+
+  categories.forEach((category, index) => {
+
+    const data =
+      categoryData[category];
+
+
+    const row =
+      document.createElement("tr");
+
+
+    row.innerHTML = `
+
+      <td style="padding:10px; border-bottom:1px solid #ddd;">
+        ${index + 1}
+      </td>
+
+      <td style="padding:10px; border-bottom:1px solid #ddd; font-weight:bold;">
+        ${category}
+      </td>
+
+      <td style="padding:10px; border-bottom:1px solid #ddd;">
+        ${data.serviceable}
+      </td>
+
+      <td style="padding:10px; border-bottom:1px solid #ddd;">
+        ${data.repairable}
+      </td>
+
+      <td style="padding:10px; border-bottom:1px solid #ddd;">
+        ${data.unserviceable}
+      </td>
+
+      <td style="padding:10px; border-bottom:1px solid #ddd; font-weight:bold;">
+        ${data.totalStock}
+      </td>
+
+    `;
+
+
+    tableBody.appendChild(row);
+
+  });
+
+
+  /* No Data */
+
+  if (categories.length === 0) {
+
+    tableBody.innerHTML = `
+
+      <tr>
+
+        <td colspan="6" style="padding:15px; text-align:center;">
+          No inventory data available.
+        </td>
+
+      </tr>
+
+    `;
+
+  }
+
+}
+
+
+/* ================= INITIAL LOAD ================= */
+
+generateCategoryStatusSummary();
+
+</script>
+
+<!-- ================= CATEGORY & STATUS SUMMARY END ================= -->
 </body>
 </html>
