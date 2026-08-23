@@ -715,7 +715,20 @@ displayInventoryItems();
   <div style="background:white; padding:15px; margin-top:20px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.08);">
 
     <h3>Transaction History</h3>
-
+<input
+  id="transactionSearch"
+  type="text"
+  placeholder="🔍 Search Item Code / Item Name / Category"
+  oninput="displayInventoryTransactions()"
+  style="
+    width:100%;
+    padding:12px;
+    margin:10px 0 15px 0;
+    box-sizing:border-box;
+    border:1px solid #cbd5e1;
+    border-radius:8px;
+  "
+>
     <div style="overflow-x:auto;">
 
       <table style="width:100%; border-collapse:collapse; min-width:1300px;">
@@ -956,14 +969,47 @@ function saveInventoryTransaction() {
 /* ================= TRANSACTION HISTORY ================= */
 
 function displayInventoryTransactions() {
+/* ================= TRANSACTION HISTORY ================= */
+
+function displayInventoryTransactions() {
 
   const body =
     document.getElementById("transactionTableBody");
 
+  const searchBox =
+    document.getElementById("transactionSearch");
+
+  const search =
+    searchBox
+      ? searchBox.value.trim().toLowerCase()
+      : "";
+
   body.innerHTML = "";
 
 
-  inventoryTransactions.forEach((tx, index) => {
+  /* ================= SEARCH FILTER ================= */
+
+  const filteredTransactions =
+    inventoryTransactions.filter(tx =>
+
+      String(tx.itemCode || "")
+        .toLowerCase()
+        .includes(search) ||
+
+      String(tx.itemName || "")
+        .toLowerCase()
+        .includes(search) ||
+
+      String(tx.category || "")
+        .toLowerCase()
+        .includes(search)
+
+    );
+
+
+  /* ================= DISPLAY TRANSACTIONS ================= */
+
+  filteredTransactions.forEach((tx, index) => {
 
     const row = document.createElement("tr");
 
@@ -1033,13 +1079,35 @@ function displayInventoryTransactions() {
 
   });
 
+
+  /* ================= NO RESULT MESSAGE ================= */
+
+  if (filteredTransactions.length === 0 && search !== "") {
+
+    body.innerHTML = `
+
+      <tr>
+
+        <td colspan="14"
+          style="padding:15px; text-align:center; color:#64748b;">
+
+          🔍 No transaction found for:
+          <strong>${search}</strong>
+
+        </td>
+
+      </tr>
+
+    `;
+
+  }
+
 }
 
 
 /* ================= LOAD TRANSACTIONS ================= */
 
 displayInventoryTransactions();
-
 </script>
 
 <!-- ================= TRANSACTION ENTRY END ================= --><!-- ================= MONTHLY SUMMARY START ================= -->
